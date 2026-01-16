@@ -1,0 +1,26 @@
+authoritative;
+ddns-update-style none;
+log-facility local7;
+
+default-lease-time 3600;
+max-lease-time 7200;
+
+option domain-name "empresa.local";
+option domain-name-servers 10.50.0.10, 10.50.0.11;
+
+# Segurança
+one-lease-per-client true;
+deny duplicates;
+
+# Não entregar DHCP fora das subnets definidas
+deny unknown-clients;
+
+# Include de sub-redes
+include "/etc/dhcp/subnets/subnet-10.50.0.0.conf";
+include "/etc/dhcp/subnets/subnet-10.50.1.0.conf";
+include "/etc/dhcp/subnets/subnet-10.50.2.0.conf";
+# ...
+# continue até subnet-10.50.63.0.conf
+
+# Hosts fixos (reservas)
+include "/etc/dhcp/hosts.conf";
