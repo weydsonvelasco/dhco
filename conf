@@ -24,3 +24,21 @@ include "/etc/dhcp/subnets/subnet-10.50.2.0.conf";
 
 # Hosts fixos (reservas)
 include "/etc/dhcp/hosts.conf";
+
+
+---
+
+subnet 10.50.0.0 netmask 255.255.255.0 {
+
+    option routers 10.50.0.1;
+    option broadcast-address 10.50.0.255;
+
+    option subnet-mask 255.255.255.0;
+
+    # Range DHCP (evitando IPs de infra)
+    range 10.50.0.50 10.50.0.200;
+
+    default-lease-time 3600;
+    max-lease-time 7200;
+
+}
