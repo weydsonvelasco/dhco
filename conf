@@ -1,12 +1,47 @@
-zone "160.190.10.in-addr.arpa" IN {
-        type master;
-        file "/var/named/dynamic/nuvem.caixa.rzone";
-        allow-update { key rndc-key; };
-};
+ named-checkzone 160.190.10.in-addr.arpa /var/named/dynamic/nuvem.caixa.rzone
+zone 160.190.10.in-addr.arpa/IN: loaded serial 2026070601
+OK
+[root@cadcllx007 dynamic]# dig 10.190.255.228 127.0.0.1
 
+; <<>> DiG 9.16.23-RH <<>> 10.190.255.228 127.0.0.1
+;; global options: +cmd
+;; Got answer:
+;; ->>HEADER<<- opcode: QUERY, status: NXDOMAIN, id: 20544
+;; flags: qr rd ra; QUERY: 1, ANSWER: 0, AUTHORITY: 1, ADDITIONAL: 1
 
+;; OPT PSEUDOSECTION:
+; EDNS: version: 0, flags:; udp: 1232
+; COOKIE: ba70d3ea58a264ff010000006a4ba0f112c06a04826f56ff (good)
+;; QUESTION SECTION:
+;10.190.255.228.                        IN      A
 
-cat > /var/named/dynamic/rzone <<'EOF'
+;; AUTHORITY SECTION:
+.                       900     IN      SOA     a.root-servers.net. nstld.verisign-grs.com. 2026070600 1800 900 604800 86400
+
+;; Query time: 24 msec
+;; SERVER: 10.190.32.11#53(10.190.32.11)
+;; WHEN: Mon Jul 06 09:34:57 -03 2026
+;; MSG SIZE  rcvd: 146
+
+;; Got answer:
+;; ->>HEADER<<- opcode: QUERY, status: NXDOMAIN, id: 29059
+;; flags: qr rd ra; QUERY: 1, ANSWER: 0, AUTHORITY: 1, ADDITIONAL: 1
+
+;; OPT PSEUDOSECTION:
+; EDNS: version: 0, flags:; udp: 1232
+; COOKIE: ba70d3ea58a264ff010000006a4ba0f112c06a04826f56ff (good)
+;; QUESTION SECTION:
+;127.0.0.1.                     IN      A
+
+;; AUTHORITY SECTION:
+.                       900     IN      SOA     a.root-servers.net. nstld.verisign-grs.com. 2026070600 1800 900 604800 86400
+
+;; Query time: 3 msec
+;; SERVER: 10.190.32.11#53(10.190.32.11)
+;; WHEN: Mon Jul 06 09:34:57 -03 2026
+;; MSG SIZE  rcvd: 141
+
+[root@cadcllx007 dynamic]# cat nuvem.caixa.rzone
 $TTL 86400
 @       IN SOA  ns01.nuvem.caixa. root.nuvem.caixa. (
                 2026070601 ; serial
@@ -20,16 +55,14 @@ $TTL 86400
 
 ; PTRs
 12      IN PTR  ns02.nuvem.caixa.
-EOF
 
 
+; masters
+228    IN      PTR     cadclcdlx002.nuvem.caixa.
+229    IN      PTR     cadclcdlx009.nuvem.caixa.
+230    IN      PTR     cadclcdlx010.nuvem.caixa.
+231    IN      PTR     cadclcdlx011.nuvem.caixa.
+232    IN      PTR     cadclcdlx013.nuvem.caixa.
+233    IN      PTR     cadclcdlx014.nuvem.caixa.
 
-
-chown named:named /var/named/dynamic/rzone
-chmod 640 /var/named/dynamic/rzone
-
-named-checkconf /etc/named.conf
-named-checkzone 160.190.10.in-addr.arpa /var/named/dynamic/rzone
-
-systemctl restart named
-systemctl status named --no-pager
+[root@cadcllx007 dynamic]#
