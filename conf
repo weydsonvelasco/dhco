@@ -1,80 +1,35 @@
-cat /etc/named.conf
-options {
-        listen-on port 53 { any; };
-
-        directory       "/var/named";
-
-        dump-file       "/var/named/data/cache_dump.db";
-        statistics-file "/var/named/data/named_stats.txt";
-        memstatistics-file "/var/named/data/named_mem_stats.txt";
-
-        max-cache-size 512M;
-
-        recursion yes;
-
-        allow-query {
-                any;
-        };
-
-        allow-query-cache {
-                localhost;
-                10.190.0.0/16;
-        };
-
-        allow-recursion {
-                localhost;
-                10.190.0.0/16;
-        };
-
-        allow-transfer {
-                127.0.0.1;
-                10.190.160.12;
-        };
-
-        also-notify {
-                10.190.160.12;
-        };
-
-        forwarders {
-                10.222.149.39;
-                10.222.161.39;
-        };
-
-        dnssec-validation no;
-
-        managed-keys-directory "/var/named/dynamic";
-
-        pid-file "/run/named/named.pid";
-        session-keyfile "/run/named/session.key";
-
-        include "/etc/crypto-policies/back-ends/bind.config";
-};
-
-key "rndc-key" {
-        algorithm hmac-sha256;
-        secret "2tu5/RHmqiDIjmCIbA0k6edM0q1bteAC+BqDcdDCdRI=";
-};
-
-controls {
-        inet 127.0.0.1 port 953
-        allow { 127.0.0.1; 10.190.160.12; }
-        keys { "rndc-key"; };
-};
-
-logging {
-        channel simple_log {
-                file "/var/log/named/bind.log" versions 10 size 20m;
-                severity info;
-                print-time yes;
-                print-severity yes;
-                print-category yes;
-        };
-
-        category default { simple_log; };
-};
-
-zone "nuvem.caixa" IN {
+zone "160.190.10.in-addr.arpa" IN {
         type master;
-        file "/var/named/dynamic/nuvem.caixa";
+        file "/var/named/dynamic/nuvem.caixa.rzone";
         allow-update { key rndc-key; };
 };
+
+
+
+cat > /var/named/dynamic/rzone <<'EOF'
+$TTL 86400
+@       IN SOA  ns01.nuvem.caixa. root.nuvem.caixa. (
+                2026070601 ; serial
+                3600       ; refresh
+                900        ; retry
+                604800     ; expire
+                86400 )    ; minimum
+
+        IN NS   ns01.nuvem.caixa.
+        IN NS   ns02.nuvem.caixa.
+
+; PTRs
+12      IN PTR  ns02.nuvem.caixa.
+EOF
+
+
+
+
+chown named:named /var/named/dynamic/rzone
+chmod 640 /var/named/dynamic/rzone
+
+named-checkconf /etc/named.conf
+named-checkzone 160.190.10.in-addr.arpa /var/named/dynamic/rzone
+
+systemctl restart named
+systemctl status named --no-pager
